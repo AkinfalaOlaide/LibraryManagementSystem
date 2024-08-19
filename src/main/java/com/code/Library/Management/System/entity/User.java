@@ -5,7 +5,6 @@ import com.code.Library.Management.System.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -15,7 +14,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @Table(name = "users")
-public class Users {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

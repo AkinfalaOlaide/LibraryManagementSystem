@@ -1,10 +1,11 @@
 package com.code.Library.Management.System.service.impl;
 
-import com.code.Library.Management.System.entity.Books;
+import com.code.Library.Management.System.entity.Book;
 import com.code.Library.Management.System.exception.ResourceNotFoundException;
 import com.code.Library.Management.System.models.BookRequest;
 import com.code.Library.Management.System.models.BookResponse;
 import com.code.Library.Management.System.repository.BookRepo;
+import com.code.Library.Management.System.repository.BookSpecificationSearch;
 import com.code.Library.Management.System.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,16 +33,12 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookResponse> findAll(String query, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber,pageSize);
-        Page<Books> searchResult = bookRepo.findByNameContainingIgnoreCaseOrAuthorNameContainingIgnoreCase(query,query,pageable);
-//        List<BookResponse> bookList = searchResult.getContent().stream()
-//                .map(books -> new BookResponse(books.getId(),books.getName(),
-//                       books.getDateOfRelease(), books.getAuthorName(),books.getCopies()))
-//                .toList();
-       return searchResult.map(books -> new BookResponse(books.getId(),books.getName(),
-                books.getDateOfRelease(), books.getAuthorName(),books.getCopies()));
-        //return new PageImpl<>(bookList,pageable, searchResult.getTotalElements());
-
-    }
+        Page<Book> searchResult = bookRepo.findAll(BookSpecificationSearch.bookSearchQuery(query),pageable);
+        List<BookResponse> bookResponses = searchResult.getContent().stream()
+                .map(book -> new BookResponse(book.getId(), book.getName(), book.getAuthorName(), book.getDateOfRelease(),book.getCopies()))
+                .toList();
+        return new PageImpl<>(bookResponses,pageable,searchResult.getTotalElements());
+      }
 
     @Override
     public BookResponse findById(Long theId) {
@@ -68,15 +63,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse save(BookRequest bookRequest) throws ParseException {
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-        Books books = Books.builder()
+    public BookResponse save(BookRequest bookRequest){
+        Book book = Book.builder()
                 .name(bookRequest.getName())
                 .authorName(bookRequest.getAuthorName())
-                .dateOfRelease(formatDate.parse(bookRequest.getDateOfRelease()))
+                .dateOfRelease(bookRequest.getDateOfRelease())
                 .copies(bookRequest.getCopies())
                 .build();
-        var saveBook = bookRepo.save(books);
+        var saveBook = bookRepo.save(book);
         return BookResponse.builder()
                 .id(saveBook.getId())
                 .name(saveBook.getName())
@@ -87,17 +81,16 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse update(Long id, BookRequest bookRequest) throws ParseException {
-        Books books = bookRepo.findById(id)
+    public BookResponse update(Long id, BookRequest bookRequest) {
+        Book book = bookRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("book not found with the id "+ id));
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
 
-        books.setName(bookRequest.getName());
-        books.setAuthorName(bookRequest.getAuthorName());
-        books.setDateOfRelease(formatDate.parse(bookRequest.getDateOfRelease()));
-        books.setCopies(bookRequest.getCopies());
+        book.setName(bookRequest.getName());
+        book.setAuthorName(bookRequest.getAuthorName());
+        book.setDateOfRelease(bookRequest.getDateOfRelease());
+        book.setCopies(bookRequest.getCopies());
 
-        var saveBooks = bookRepo.save(books);
+        var saveBooks = bookRepo.save(book);
         return BookResponse.builder()
                 .id(saveBooks.getId())
                 .name(saveBooks.getName())

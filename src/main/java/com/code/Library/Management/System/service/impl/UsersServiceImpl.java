@@ -1,13 +1,14 @@
 package com.code.Library.Management.System.service.impl;
 
-import com.code.Library.Management.System.entity.Books;
-import com.code.Library.Management.System.entity.Users;
+import com.code.Library.Management.System.entity.Book;
+import com.code.Library.Management.System.entity.User;
 import com.code.Library.Management.System.exception.ResourceNotFoundException;
-import com.code.Library.Management.System.models.BookRequest;
 import com.code.Library.Management.System.models.BookResponse;
 import com.code.Library.Management.System.models.UserRequest;
 import com.code.Library.Management.System.models.UserResponse;
+import com.code.Library.Management.System.repository.BookSpecificationSearch;
 import com.code.Library.Management.System.repository.UserRepository;
+import com.code.Library.Management.System.repository.UserSpecificationSearch;
 import com.code.Library.Management.System.service.UsersService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,14 +32,12 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public Page<UserResponse> findAll(String query, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber,pageSize);
-        Page<Users> searchResult = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailAddressContainingIgnoreCaseOrPhoneNumberContainingIgnoreCase
-                (query,query,query,query,pageable);
-        List<UserResponse> userResponseList = searchResult.getContent().stream()
-                .map(users -> new UserResponse(users.getId(),users.getFirstName(),
-                        users.getFirstName(), users.getDateOfBirth(),users.getStatus()
-                ,users.getEmailAddress(),users.getPhoneNumber()))
+        Page<User> searchResult = userRepository.findAll(UserSpecificationSearch.userSearchQuery(query),pageable);
+        List<UserResponse> userResponses = searchResult.getContent().stream()
+                .map(user -> new UserResponse(user.getId(), user.getFirstName(), user.getLastName(),
+                        user.getDateOfBirth(),user.getStatus(),user.getEmailAddress(),user.getPhoneNumber()))
                 .toList();
-        return new PageImpl<>(userResponseList,pageable, searchResult.getTotalElements());
+        return new PageImpl<>(userResponses,pageable,searchResult.getTotalElements());
     }
 
     @Override
@@ -52,6 +50,7 @@ public class UsersServiceImpl implements UsersService {
                 .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .dateOfBirth(user.getDateOfBirth())
                 .status(user.getStatus())
                 .emailAddress(user.getEmailAddress())
                 .phoneNumber(user.getPhoneNumber())
@@ -65,18 +64,17 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public UserResponse save(UserRequest userRequest) throws ParseException {
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-        Users users = Users.builder()
+    public UserResponse save(UserRequest userRequest){
+        User user = User.builder()
                 .firstName(userRequest.getFirstName())
                 .lastName(userRequest.getLastName())
-                .dateOfBirth(formatDate.parse(userRequest.getDateOfBirth()))
+                .dateOfBirth(userRequest.getDateOfBirth())
                 .status(userRequest.getStatus())
                 .emailAddress(userRequest.getEmailAddress())
                 .phoneNumber(userRequest.getPhoneNumber())
                 .build();
 
-        var saveUser = userRepository.save(users);
+        var saveUser = userRepository.save(user);
         return UserResponse.builder()
                 .id(saveUser.getId())
                 .firstName(saveUser.getFirstName())
@@ -89,19 +87,18 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public UserResponse update(Long id, UserRequest userRequest) throws ParseException {
-        Users users = userRepository.findById(id)
+    public UserResponse update(Long id, UserRequest userRequest){
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("user not found with the id "+ id));
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
 
-        users.setFirstName(userRequest.getFirstName());
-        users.setLastName(userRequest.getLastName());
-        users.setDateOfBirth(formatDate.parse(userRequest.getDateOfBirth()));
-        users.setStatus(userRequest.getStatus());
-        users.setEmailAddress(userRequest.getEmailAddress());
-        users.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setDateOfBirth(userRequest.getDateOfBirth());
+        user.setStatus(userRequest.getStatus());
+        user.setEmailAddress(userRequest.getEmailAddress());
+        user.setPhoneNumber(userRequest.getPhoneNumber());
 
-        var saveUsers = userRepository.save(users);
+        var saveUsers = userRepository.save(user);
         return UserResponse.builder()
                 .id(saveUsers.getId())
                 .firstName(saveUsers.getFirstName())

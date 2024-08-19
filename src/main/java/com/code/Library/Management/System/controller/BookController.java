@@ -3,6 +3,7 @@ package com.code.Library.Management.System.controller;
 import com.code.Library.Management.System.models.BookRequest;
 import com.code.Library.Management.System.models.BookResponse;
 import com.code.Library.Management.System.service.BookService;
+import jakarta.validation.Valid;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,20 +27,20 @@ public class BookController {
 
 
     @GetMapping
-    public ResponseEntity<Page<BookResponse>> searchBooks(@RequestParam("pageSize") int size,
-                                                          @RequestParam ("pageNumber")int pageNumber
+    public ResponseEntity<Page<BookResponse>> searchBooks(@RequestParam(value = "pageSize",defaultValue = "10") int size,
+                                                          @RequestParam (value = "pageNumber",defaultValue ="0")int pageNumber
                                          , @RequestParam("searchPhrase") String query) {
         Page<BookResponse> book = bookService.findAll(query,size,pageNumber);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<BookResponse> addBook(@RequestBody BookRequest bookRequest) throws ParseException {
+    public ResponseEntity<BookResponse> addBook(@Valid @RequestBody BookRequest bookRequest) {
         return new ResponseEntity<>(bookService.save(bookRequest), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookResponse> updateBook(@PathVariable Long id, @RequestBody BookRequest bookRequest) throws ParseException {
+    public ResponseEntity<BookResponse> updateBook(@PathVariable Long id, @Valid @RequestBody BookRequest bookRequest){
         BookResponse bookResponse = bookService.update(id, bookRequest);
         return new ResponseEntity<>(bookResponse, HttpStatus.OK);
     }

@@ -6,6 +6,7 @@ import com.code.Library.Management.System.models.UserRequest;
 import com.code.Library.Management.System.models.UserResponse;
 import com.code.Library.Management.System.service.BookService;
 import com.code.Library.Management.System.service.UsersService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -27,20 +28,20 @@ public class UsersController {
 
 
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> searchUser(@RequestParam("pageSize") int size,
-                                                          @RequestParam ("pageNumber")int pageNumber
+    public ResponseEntity<Page<UserResponse>> searchUser(@RequestParam(value = "pageSize",defaultValue = "10") int size,
+                                                         @RequestParam (value = "pageNumber",defaultValue ="0")int pageNumber
             , @RequestParam("searchPhrase") String query) {
         Page<UserResponse> user = usersService.findAll(query,size,pageNumber);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest userRequest) throws ParseException {
+    public ResponseEntity<UserResponse> addUser(@Valid @RequestBody UserRequest userRequest) {
         return new ResponseEntity<>(usersService.save(userRequest), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) throws ParseException {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,@Valid @RequestBody UserRequest userRequest){
         UserResponse userResponse = usersService.update(id, userRequest);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }

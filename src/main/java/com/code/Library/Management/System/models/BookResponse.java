@@ -12,8 +12,8 @@ public class BookResponse {
     private Long id;
 
     private String name;
-    private Date dateOfRelease;
     private String authorName;
+    private Date dateOfRelease;
     private int copies;
 
 

@@ -14,7 +14,7 @@ public interface BookService {
     BookResponse findById(Long theId);
     void deleteById(Long theId);
 
-    BookResponse save(BookRequest book) throws ParseException;
+    BookResponse save(BookRequest book);
 
-    BookResponse update(Long id, BookRequest book) throws ParseException;
+    BookResponse update(Long id, BookRequest book);
 }

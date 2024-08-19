@@ -18,7 +18,7 @@ public interface UsersService {
     UserResponse findById(Long theId);
     void deleteById(Long theId);
 
-    UserResponse save(UserRequest user) throws ParseException;
+    UserResponse save(UserRequest user);
 
-    UserResponse update(Long id, UserRequest user) throws ParseException;
+    UserResponse update(Long id, UserRequest user);
 }
