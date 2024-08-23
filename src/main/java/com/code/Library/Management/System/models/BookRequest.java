@@ -19,7 +19,7 @@ public class BookRequest {
     private String authorName;
 
     @NotNull(message = " Date cannot be null")
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfRelease;
 
     @NotNull(message = "Copies cannot be null")
