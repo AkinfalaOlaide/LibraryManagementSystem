@@ -12,21 +12,21 @@ import java.util.Date;
 @Entity
 @Builder
 @AllArgsConstructor
-@Table(name = "books")
+@Table(name = "Book")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "book id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name")
     private String name;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "date of release")
+    @Column(name = "dateOfRelease")
     private Date dateOfRelease;
 
-    @Column(name = "author's name")
+    @Column(name = "authorName")
     private String authorName;
 
     @Column(name = "copies")

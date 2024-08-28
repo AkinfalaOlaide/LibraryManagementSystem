@@ -18,13 +18,13 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "first name")
+    @Column(name = "firstName")
     private String firstName;
 
-    @Column(name = "last name")
+    @Column(name = "lastName")
     private String  lastName;
 
     @Column(name = "dob")
@@ -34,10 +34,10 @@ public class User {
     @Column(name = "status")
     private Status status;
 
-    @Column(name = "email address")
+    @Column(name = "emailAddress")
     private String emailAddress;
 
-     @Column(name = "phone number")
+     @Column(name = "phoneNumber")
     private String phoneNumber;
 
 }
